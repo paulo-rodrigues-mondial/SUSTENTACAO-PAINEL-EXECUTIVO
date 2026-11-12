@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sustentação Mondial — Painel Executivo | Mondial Eletrodomésticos</title>
+  <link rel="stylesheet" href="sustentacao-painel-estilo.css?v=2026.11.12-1208">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+</head>
+<body class="tab-active-visao-executiva">
+
+  <div class="app-container" id="app-container">
+    <!-- HEADER EXECUTIVO (padrão GMUD Mondial) -->
+    <header class="header">
+      <div class="mondial-watermark" aria-hidden="true" title="Mondial Eletrodomésticos">
+        <svg viewBox="0 0 190 48" fill="none" xmlns="http://www.w3.org/2000/svg" class="mondial-watermark-svg">
+          <text x="0" y="26" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif" font-size="26" font-weight="900" font-style="italic" fill="#7CA1C4" letter-spacing="0.8">MONDIAL</text>
+          <line x1="0" y1="33" x2="155" y2="33" stroke="#7CA1C4" stroke-width="1.6" opacity="0.9" />
+          <text x="1" y="43" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif" font-size="8" font-weight="800" fill="#7CA1C4" letter-spacing="2.8">ELETRODOMÉSTICOS</text>
+        </svg>
+      </div>
+      <div class="header-top">
+        <div class="header-titles">
+          <h1>SUSTENTAÇÃO MONDIAL - PAINEL EXECUTIVO</h1>
+          <div class="subtitle">Gestão de Chamados, SLA e Desempenho Operacional • N3 - Sistemas Sustentação</div>
+        </div>
+        <div class="header-actions">
+          <button type="button" class="btn-action" id="btn-open-glossary" title="Regras de cálculo, glossário e qualidade da base">
+            <span>📖</span><span>Regras</span>
+          </button>
+          <button type="button" class="btn-action" id="btn-toggle-filters">
+            <span>🔍</span><span>Filtros</span>
+            <span class="filter-count-badge" id="filter-count-badge" style="display:none;">0</span>
+          </button>
+          <button type="button" class="btn-action btn-tv-watermark" id="btn-toggle-tv" title="Ativar Modo TV Apresentação" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.22); color:rgba(255,255,255,0.85); padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600;">
+            <span style="font-size:11px;">📺</span>
+            <span id="tv-label">Modo TV</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- BARRA DE FILTROS GLOBAIS -->
+      <div class="filters-bar" id="filters-bar">
+        <div class="filter-group"><label for="f-ano">Ano (criação)</label><select id="f-ano" data-f="ano"><option value="">Todos</option></select></div>
+        <div class="filter-group"><label for="f-mes">Mês (criação)</label><select id="f-mes" data-f="mes"><option value="">Todos</option></select></div>
+        <div class="filter-group"><label for="f-estado">Estado</label><select id="f-estado" data-f="estado"><option value="">Todos</option></select></div>
+        <div class="filter-group"><label for="f-tipo">Tipo</label><select id="f-tipo" data-f="tipo"><option value="">Todos</option></select></div>
+        <div class="filter-group"><label for="f-prioridade">Prioridade</label><select id="f-prioridade" data-f="prioridade"><option value="">Todas</option></select></div>
+        <div class="filter-group"><label for="f-categoria">Categoria</label><select id="f-categoria" data-f="categoria"><option value="">Todas</option></select></div>
+        <div class="filter-group"><label for="f-sistema">Serviço / Sistema</label><select id="f-sistema" data-f="sistema"><option value="">Todos</option></select></div>
+        <div class="filter-group"><label for="f-fornecedor">Fornecedor</label><select id="f-fornecedor" data-f="fornecedor"><option value="">Todos</option></select></div>
+        <div class="filter-group"><label for="f-agente">Agente</label><select id="f-agente" data-f="agente"><option value="">Todos</option></select></div>
+        <div class="filter-group"><label for="f-prazo">Prazo</label>
+          <select id="f-prazo" data-f="prazo">
+            <option value="">Todos</option>
+            <option value="atrasado">Atrasados (abertos)</option>
+            <option value="fora">Fechados fora do prazo</option>
+            <option value="noprazo">Fechados no prazo</option>
+          </select>
+        </div>
+        <div class="filter-group"><label for="f-inconf">Inconformidade</label>
+          <select id="f-inconf" data-f="inconf">
+            <option value="">Incluir todos</option>
+            <option value="somente">Somente INCONFORMIDADE</option>
+            <option value="excluir">Excluir INCONFORMIDADE</option>
+          </select>
+        </div>
+        <button type="button" class="btn-clear-filters" id="btn-clear-filters">Limpar</button>
+      </div>
+    </header>
+
+    <!-- MENU SUPERIOR — 8 ITENS (padrão GMUD) -->
+    <div class="tabs-container">
+      <nav class="tabs-nav-grid" id="main-navigation-tabs" aria-label="Navegação do painel">
+        <button type="button" class="tab-nav-item active" data-tab="visao-executiva"><span class="tab-nav-icon">📊</span><span class="tab-nav-text">Visão Executiva</span></button>
+        <button type="button" class="tab-nav-item" data-tab="backlog-aging"><span class="tab-nav-icon">⏳</span><span class="tab-nav-text">Backlog & Aging</span></button>
+        <button type="button" class="tab-nav-item" data-tab="sla-tempos"><span class="tab-nav-icon">⚡</span><span class="tab-nav-text">SLA & Tempos</span></button>
+        <button type="button" class="tab-nav-item" data-tab="sistemas"><span class="tab-nav-icon">🧩</span><span class="tab-nav-text">Sistemas & Fornecedores</span></button>
+        <button type="button" class="tab-nav-item" data-tab="demanda-areas"><span class="tab-nav-icon">🏢</span><span class="tab-nav-text">Demanda & Áreas</span></button>
+        <button type="button" class="tab-nav-item" data-tab="desvios"><span class="tab-nav-icon">🚨</span><span class="tab-nav-text">Desvios & Qualidade</span></button>
+        <button type="button" class="tab-nav-item" data-tab="operacao"><span class="tab-nav-icon">⚙️</span><span class="tab-nav-text">Operação</span></button>
+        <button type="button" class="tab-nav-item" data-tab="todos-chamados"><span class="tab-nav-icon">📋</span><span class="tab-nav-text">Todos os Chamados</span></button>
+      </nav>
+      <div class="tabs-progress-track" aria-hidden="true"><div class="tabs-progress-fill" id="tabs-progress-fill"></div></div>
+    </div>
+
+    <main class="page-stack">
+      <!-- 1. VISÃO EXECUTIVA -->
+      <section class="page active" id="tab-visao-executiva">
+        <div class="kpi-row kpi-row-9">
+          <div class="kpi-card" title="Quantidade de tickets após os filtros."><span class="kpi-label">Volume Total</span><span class="kpi-val" id="k-total">—</span><span class="kpi-sub" id="k-total-sub">tickets</span></div>
+          <div class="kpi-card" title="Estados de backlog: Aberto, ReOpen, Pendente, Pendente Aprovação, Pendente Fornecedor."><span class="kpi-label">Em Aberto</span><span class="kpi-val" id="k-backlog">—</span><span class="kpi-sub">Fila em andamento</span></div>
+          <div class="kpi-card" style="border-left-color:var(--verde);" title="Estados Resolvido + Fechado."><span class="kpi-label">Encerrados</span><span class="kpi-val" id="k-encerrados" style="color:var(--verde);">—</span><span class="kpi-sub">Resolvido + Fechado</span></div>
+          <div class="kpi-card" id="k-card-sla" style="border-left-color:var(--verde);" title="Encerrados no prazo ÷ encerrados com prazo (Estado de resolução)."><span class="kpi-label">Taxa no Prazo</span><span class="kpi-val" id="k-sla-res" style="color:var(--verde);">—</span><span class="kpi-sub" id="k-sla-res-sub">SLA de resolução</span></div>
+          <div class="kpi-card" style="border-left-color:var(--amarelo);" title="Média de dias corridos entre a criação e a resolução dos encerrados."><span class="kpi-label">Lead Time Médio</span><span class="kpi-val" id="k-lead" style="color:var(--amarelo);">—</span><span class="kpi-sub" id="k-lead-sub">Criação até resolução</span></div>
+          <div class="kpi-card" id="k-card-atrasados" style="border-left-color:var(--vermelho);" title="Tickets em aberto com Hora de vencimento anterior à data de referência."><span class="kpi-label">Atrasados</span><span class="kpi-val" id="k-atrasados" style="color:var(--vermelho);">—</span><span class="kpi-sub" id="k-atrasados-sub">Abertos com vencimento expirado</span></div>
+          <div class="kpi-card kpi-card-fora-prazo" id="k-card-fora" style="border-left-color:#B91C1C;" title="Encerrados com Hora de resolução posterior à Hora de vencimento."><span class="kpi-label">Fechados Fora do Prazo</span><span class="kpi-val" id="k-fora" style="color:#B91C1C;">—</span><span class="kpi-sub" id="k-fora-sub">Resolução após o vencimento</span></div>
+          <div class="kpi-card" id="k-card-fr" style="border-left-color:var(--azul-medio);" title="Within SLA ÷ (Within SLA + SLA Violated) do Estado da primeira resposta."><span class="kpi-label">SLA 1ª Resposta</span><span class="kpi-val" id="k-sla-fr" style="color:var(--azul-medio);">—</span><span class="kpi-sub" id="k-sla-fr-sub">status da ferramenta</span></div>
+          <div class="kpi-card" style="border-left-color:var(--roxo);" title="Agente = No Agent ou Categoria vazia."><span class="kpi-label">Inconformidade</span><span class="kpi-val" id="k-inconf" style="color:var(--roxo);">—</span><span class="kpi-sub" id="k-inconf-sub">sem agente / sem categoria</span></div>
+        </div>
+        <div class="exec-grid-1">
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Evolução Mensal de Chamados (Entradas vs Encerrados)</span><span class="chart-note">entrada = criação • encerrado = mês da resolução</span></div><div class="chart-body"><canvas id="c-evolucao"></canvas></div></div>
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Distribuição por Estado</span></div><div class="chart-body"><div class="donut-container"><div class="donut-chart-box"><canvas id="c-estado"></canvas></div><div class="donut-legend-box" id="legend-estado"></div></div></div></div>
+        </div>
+        <div class="exec-grid-2">
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Top 5 Itens de Catálogo</span></div><div class="chart-body"><canvas id="c-item"></canvas></div></div>
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Distribuição por Prioridade</span></div><div class="chart-body"><canvas id="c-prioridade"></canvas></div></div>
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Tipo de Chamado (Incidente / Requisição)</span></div><div class="chart-body"><canvas id="c-tipo"></canvas></div></div>
+        </div>
+        <div class="exec-action-banner" id="exec-banner">
+          <div class="exec-action-center">
+            <div class="exec-action-title">Resumo Operacional da Sustentação</div>
+            <div class="exec-action-sub" id="banner-sub" style="display:none;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. BACKLOG & AGING -->
+      <section class="page" id="tab-backlog-aging">
+        <div class="kpi-row kpi-row-4">
+          <div class="kpi-card"><span class="kpi-label">Backlog Ativo</span><span class="kpi-val" id="b-backlog">—</span><span class="kpi-sub" id="b-backlog-sub">Tickets em aberto</span></div>
+          <div class="kpi-card" style="border-left-color:var(--amarelo);"><span class="kpi-label">Aging Médio</span><span class="kpi-val" id="b-aging" style="color:var(--amarelo);">—</span><span class="kpi-sub" id="b-aging-sub">Idade média dos tickets abertos</span></div>
+          <div class="kpi-card" id="b-card-critico" style="border-left-color:var(--vermelho);"><span class="kpi-label"><span id="b-critico-label">Backlog Crítico</span> <span class="badge-alerta-pulsante" id="b-critico-badge" style="display:none;">🚨 CRÍTICO</span></span><span class="kpi-val" id="b-critico" style="color:var(--vermelho);">—</span><span class="kpi-sub" id="b-critico-sub">—</span></div>
+          <div class="kpi-card" style="border-left-color:var(--verde);"><span class="kpi-label">Resolvidos no Prazo</span><span class="kpi-val" id="b-noprazo" style="color:var(--verde);">—</span><span class="kpi-sub" id="b-noprazo-sub">Entregues até o vencimento</span></div>
+        </div>
+        <div class="exec-grid-1">
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Faixas de Envelhecimento do Backlog (Aging Buckets)</span><span class="chart-note">dias corridos desde a criação</span></div><div class="chart-body"><canvas id="c-aging"></canvas></div></div>
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Backlog Ativo por Estado</span></div><div class="chart-body"><canvas id="c-backlog-estado"></canvas></div></div>
+        </div>
+        <div class="exec-grid-1">
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Tickets em Aberto (mais antigos primeiro)</span><span class="chart-note">clique para detalhes</span></div><div class="chart-body table-body" id="t-backlog"></div></div>
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Backlog Ativo por Agente</span></div><div class="chart-body"><canvas id="c-backlog-agente"></canvas></div></div>
+        </div>
+      </section>
+
+      <!-- 3. SLA & TEMPOS -->
+      <section class="page" id="tab-sla-tempos">
+        <div class="kpi-row">
+          <div class="kpi-card" id="s-card-res" style="border-left-color:var(--verde);"><span class="kpi-label">Taxa no Prazo (Resolução)</span><span class="kpi-val" id="s-res" style="color:var(--verde);">—</span><span class="kpi-sub" id="s-res-sub">—</span></div>
+          <div class="kpi-card" style="border-left-color:#B91C1C;"><span class="kpi-label">Fechados Fora do Prazo</span><span class="kpi-val" id="s-fora" style="color:#B91C1C;">—</span><span class="kpi-sub">SLA Violated</span></div>
+          <div class="kpi-card" style="border-left-color:var(--azul-medio);"><span class="kpi-label">SLA 1ª Resposta</span><span class="kpi-val" id="s-fr" style="color:var(--azul-medio);">—</span><span class="kpi-sub" id="s-fr-sub">—</span></div>
+          <div class="kpi-card" style="border-left-color:var(--vermelho);"><span class="kpi-label">Violações 1ª Resposta</span><span class="kpi-val" id="s-fr-v" style="color:var(--vermelho);">—</span><span class="kpi-sub">SLA Violated</span></div>
+          <div class="kpi-card" style="border-left-color:var(--texto-mutado);"><span class="kpi-label">Sem Status 1ª Resposta</span><span class="kpi-val" id="s-sem-fr">—</span><span class="kpi-sub">fora do denominador</span></div>
+          <div class="kpi-card" style="border-left-color:var(--amarelo);"><span class="kpi-label">Lead Time Médio</span><span class="kpi-val" id="s-lead" style="color:var(--amarelo);">—</span><span class="kpi-sub" id="s-lead-sub">dias corridos</span></div>
+          <div class="kpi-card" style="border-left-color:var(--amarelo);"><span class="kpi-label">Resolução P50 / P90</span><span class="kpi-val" id="s-p50" style="color:var(--amarelo);">—</span><span class="kpi-sub" id="s-p90">horas úteis (ferramenta)</span></div>
+          <div class="kpi-card" style="border-left-color:var(--azul-medio);"><span class="kpi-label">1ª Resposta P50</span><span class="kpi-val" id="s-fr-p50" style="color:var(--azul-medio);">—</span><span class="kpi-sub">horas úteis (ferramenta)</span></div>
+        </div>
+        <div class="exec-grid-1">
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Cumprimento de SLA por Mês (%)</span><span class="chart-note">resolução: mês da resolução • 1ª resposta: mês da criação</span></div><div class="chart-body"><svg id="c-sla-mes" class="monitor-svg"></svg></div></div>
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Taxa no Prazo por Tipo e Prioridade (%)</span></div><div class="chart-body"><canvas id="c-sla-tp"></canvas></div></div>
+        </div>
+        <div class="exec-grid-1">
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Evolução do Lead Time Médio (dias corridos)</span><span class="chart-note">mês da resolução</span></div><div class="chart-body"><svg id="c-lead-mes" class="monitor-svg"></svg></div></div>
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Tempo de Resolução — P50 e P90 (horas úteis)</span></div><div class="chart-body"><svg id="c-tempo-mes" class="monitor-svg"></svg></div></div>
+        </div>
+      </section>
+
+      <!-- 4. SISTEMAS & FORNECEDORES -->
+      <section class="page" id="tab-sistemas">
+        <div class="exec-grid-1 grid-half">
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Tickets por Serviço / Sistema</span></div><div class="chart-body"><canvas id="c-sistema"></canvas></div></div>
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">% Fechados Fora do Prazo por Serviço / Sistema</span><span class="chart-note">fora do prazo / encerrados com prazo</span></div><div class="chart-body"><canvas id="c-sistema-fora"></canvas></div></div>
+        </div>
+        <div class="exec-grid-1 grid-half">
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Tickets com Fornecedor</span></div><div class="chart-body"><canvas id="c-fornecedor"></canvas></div></div>
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Backlog com Fornecedor (por estado)</span></div><div class="chart-body table-body" id="t-fornecedor"></div></div>
+        </div>
+      </section>
+
+      <!-- 5. DEMANDA & ÁREAS -->
+      <section class="page" id="tab-demanda-areas">
+        <div class="exec-grid-1">
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Demanda por Departamento (Top 15)</span></div><div class="chart-body"><canvas id="c-depto"></canvas></div></div>
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Distribuição por Agente — Encerrados e Em Aberto</span><span class="chart-note">responsável atual • ordem alfabética, sem ranking</span></div><div class="chart-body"><canvas id="c-agente"></canvas></div></div>
+        </div>
+        <div class="exec-grid-2 grid-heat">
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Localização do Solicitante</span><span class="chart-note">como na base</span></div><div class="chart-body"><canvas id="c-local"></canvas></div></div>
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Origem do Chamado</span></div><div class="chart-body"><canvas id="c-origem"></canvas></div></div>
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Entradas por Dia da Semana e Hora</span></div><div class="chart-body table-body" id="h-heatmap"></div></div>
+        </div>
+      </section>
+
+      <!-- 6. DESVIOS & QUALIDADE -->
+      <section class="page" id="tab-desvios">
+        <div class="kpi-row">
+          <div class="kpi-card" style="border-left-color:#B91C1C;"><span class="kpi-label">Fechados Fora do Prazo</span><span class="kpi-val" id="d-fora" style="color:#B91C1C;">—</span><span class="kpi-sub" id="d-fora-sub">—</span></div>
+          <div class="kpi-card" style="border-left-color:var(--amarelo);"><span class="kpi-label">Atraso Mediano</span><span class="kpi-val" id="d-atraso" style="color:var(--amarelo);">—</span><span class="kpi-sub">vencimento → resolução (corridas)</span></div>
+          <div class="kpi-card" id="d-card-atrasados" style="border-left-color:var(--vermelho);"><span class="kpi-label">Atrasados (abertos)</span><span class="kpi-val" id="d-atrasados" style="color:var(--vermelho);">—</span><span class="kpi-sub">vencimento expirado</span></div>
+          <div class="kpi-card" style="border-left-color:var(--roxo);"><span class="kpi-label">Inconformidade</span><span class="kpi-val" id="d-inconf" style="color:var(--roxo);">—</span><span class="kpi-sub" id="d-inconf-sub">—</span></div>
+          <div class="kpi-card" style="border-left-color:var(--roxo);"><span class="kpi-label">Sem Agente</span><span class="kpi-val" id="d-semag" style="color:var(--roxo);">—</span><span class="kpi-sub">Agente = No Agent</span></div>
+          <div class="kpi-card" style="border-left-color:var(--roxo);"><span class="kpi-label">Sem Categoria</span><span class="kpi-val" id="d-semcat" style="color:var(--roxo);">—</span><span class="kpi-sub">Categoria vazia</span></div>
+          <div class="kpi-card" style="border-left-color:var(--texto-mutado);"><span class="kpi-label">Chamado Indevido</span><span class="kpi-val" id="d-indevido">—</span><span class="kpi-sub">Categoria 0 - Chamado Indevido</span></div>
+          <div class="kpi-card" id="d-card-div" style="border-left-color:var(--verde);"><span class="kpi-label">Regra × Ferramenta</span><span class="kpi-val" id="d-div" style="color:var(--verde);">—</span><span class="kpi-sub" id="d-div-sub">divergências de prazo</span></div>
+        </div>
+        <div class="exec-grid-1">
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Fechados Fora do Prazo por Mês</span><span class="chart-note">mês da resolução • % sobre encerrados com prazo</span></div><div class="chart-body"><canvas id="c-fora-mes"></canvas></div></div>
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Tamanho do Atraso dos Fechados Fora do Prazo</span></div><div class="chart-body"><canvas id="c-atraso-faixas"></canvas></div></div>
+        </div>
+        <div class="exec-grid-1">
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Inconformidade por Mês de Criação</span></div><div class="chart-body"><canvas id="c-inconf-mes"></canvas></div></div>
+          <div class="chart-card"><div class="chart-header"><span class="chart-title">Fechados Fora do Prazo por Item de Catálogo</span></div><div class="chart-body"><canvas id="c-fora-item"></canvas></div></div>
+        </div>
+      </section>
+
+      <!-- 7. OPERAÇÃO -->
+      <section class="page" id="tab-operacao">
+        <div class="op-card">
+          <div class="op-menu-bar">
+            <div>
+              <div class="op-title">Fila Operacional de Chamados</div>
+              <div class="op-subtitle">Rolagem contínua • clique em uma linha para os detalhes • Descrição e Solução não são exibidas (privacidade)</div>
+            </div>
+            <div class="op-menu-nav" id="op-menu-nav">
+              <button type="button" class="op-menu-btn active" data-op="todos">Todos <span class="op-badge" id="op-c-todos">0</span></button>
+              <button type="button" class="op-menu-btn" data-op="aberto">Em Aberto <span class="op-badge" id="op-c-aberto">0</span></button>
+              <button type="button" class="op-menu-btn" data-op="atrasado">Atrasados <span class="op-badge" id="op-c-atrasado">0</span></button>
+              <button type="button" class="op-menu-btn" data-op="fornecedor">Pend. Fornecedor <span class="op-badge" id="op-c-fornecedor">0</span></button>
+              <button type="button" class="op-menu-btn" data-op="fora">Fora do Prazo <span class="op-badge" id="op-c-fora">0</span></button>
+              <button type="button" class="op-menu-btn" data-op="inconf">Inconformidade <span class="op-badge" id="op-c-inconf">0</span></button>
+            </div>
+          </div>
+          <div class="op-menu-bar" style="padding-bottom:6px;">
+            <div class="op-controls">
+              <input type="search" id="op-busca" class="op-search" placeholder="Buscar ID, assunto, agente, sistema…" aria-label="Buscar tickets">
+              <span class="op-ctrl-sep"></span>
+              <button type="button" class="btn-speed-opt" id="op-pausa">⏸️ Pausar</button>
+              <button type="button" class="btn-speed-opt active" data-op-vel="lento">Lento</button>
+              <button type="button" class="btn-speed-opt" data-op-vel="normal">Normal</button>
+              <button type="button" class="btn-speed-opt" data-op-vel="rapido">Rápido</button>
+              <span class="op-ctrl-sep"></span>
+              <button type="button" class="btn-speed-opt" id="op-exportar" title="Exporta a lista filtrada em CSV (Excel)">⬇️ Exportar CSV</button>
+            </div>
+            <span class="op-marquee-status-pill" id="op-status-pill"><span class="pulse-dot"></span><span id="op-status-txt">Rolagem ativa</span></span>
+          </div>
+          <div class="op-table-container">
+            <table class="op-head-table">
+              <colgroup id="op-cols-head"></colgroup>
+              <thead><tr>
+                <th>ID</th><th>Assunto</th><th>Item de Catálogo</th><th>Prioridade</th><th>Estado</th>
+                <th>Departamento</th><th>Agente</th><th style="text-align:center;">Criação</th><th style="text-align:center;">Vencimento</th><th style="text-align:center;">Resolução</th>
+              </tr></thead>
+            </table>
+            <div class="op-body-viewport" id="op-body-viewport">
+              <div class="op-marquee-track" id="op-marquee-track">
+                <table class="op-body-table" id="op-body-table"><colgroup id="op-cols-body"></colgroup><tbody></tbody></table>
+              </div>
+            </div>
+          </div>
+          <div class="op-footer"><span id="op-footer-info">—</span><span>Linhas em vermelho pulsante = atrasados</span></div>
+        </div>
+      </section>
+
+      <!-- 8. TODOS OS CHAMADOS -->
+      <section class="page" id="tab-todos-chamados">
+        <div class="changes-card" style="padding: clamp(4px, 0.7vh, 10px);">
+          <div class="changes-toolbar">
+            <div style="display:flex; flex-wrap:wrap; align-items:center; gap:6px;">
+              <span style="font-size:11px; font-weight:800; color:var(--azul-escuro); margin-right:4px;">Exibir:</span>
+              <button type="button" class="btn-lane-filter active" data-kb-filtro="todos">📋 Todos</button>
+              <button type="button" class="btn-lane-filter" data-kb-filtro="aberto">🟢 Em Aberto</button>
+              <button type="button" class="btn-lane-filter" data-kb-filtro="atrasado">🚨 Atrasados</button>
+              <button type="button" class="btn-lane-filter" data-kb-filtro="fornecedor">⏸️ Pend. Fornecedor</button>
+              <button type="button" class="btn-lane-filter" data-kb-filtro="encerrado">✅ Encerrados</button>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; align-items:center; gap:6px;">
+              <span style="font-size:11px; font-weight:800; color:var(--azul-escuro); margin-right:4px;">Agrupar por:</span>
+              <button type="button" class="btn-lane-group active" data-kb-grupo="estado">Estado (Kanban)</button>
+              <button type="button" class="btn-lane-group" data-kb-grupo="sistema">Serviço / Sistema</button>
+              <button type="button" class="btn-lane-group" data-kb-grupo="categoria">Categoria</button>
+              <button type="button" class="btn-lane-group" data-kb-grupo="departamento">Departamento</button>
+              <span style="display:inline-flex; align-items:center; gap:4px; margin-left:6px; border-left:1px solid #CBD5E1; padding-left:8px;">
+                <button type="button" class="btn-speed-opt" id="kb-pausa">⏸️ Pausar</button>
+                <button type="button" class="btn-speed-opt active" data-kb-vel="lento">Lento</button>
+                <button type="button" class="btn-speed-opt" data-kb-vel="normal">Normal</button>
+                <button type="button" class="btn-speed-opt" data-kb-vel="rapido">Rápido</button>
+              </span>
+            </div>
+          </div>
+          <div class="changes-board" id="kb-board"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- RODAPÉ CORPORATIVO -->
+    <footer class="footer">
+      <div class="footer-left"><span><strong>Mondial Eletrodomésticos S.A.</strong> • Sustentação de Sistemas &amp; Gestão de Chamados ITIL 4</span></div>
+      <div class="footer-center"><span class="footer-slogan"><strong class="footer-slogan-brand">Mondial.</strong><span class="footer-slogan-text">A escolha inteligente.</span></span></div>
+      <div class="footer-right">
+        <button type="button" class="btn-update-data" id="btn-update-data" title="Pré-visualiza outra exportação do Freshservice só nesta tela (não altera a base oficial)">
+          <span>📥</span><span>Atualizar Base (Excel / CSV)</span>
+        </button>
+        <span id="base-info" style="font-size:10px; color:var(--texto-mutado);">Base: —</span>
+        <span style="font-size:10px; color:var(--texto-mutado);">Status: <strong id="status-base">—</strong></span>
+      </div>
+    </footer>
+
+    <input type="file" id="file-input" accept=".xlsx,.xls,.csv" style="display:none;" />
+
+    <!-- MODAL DE DETALHES DO TICKET -->
+    <div class="modal-backdrop" id="modal-details">
+      <div class="modal-box">
+        <div class="modal-head"><strong id="modal-title">Ticket</strong><button type="button" class="modal-close" data-close="modal-details" aria-label="Fechar">&times;</button></div>
+        <div class="modal-content" id="modal-content"></div>
+        <div class="modal-footer"><button type="button" class="btn-action" style="background:var(--azul-escuro);" data-close="modal-details">Fechar</button></div>
+      </div>
+    </div>
+
+    <!-- MODAL DE REGRAS, GLOSSÁRIO E QUALIDADE DA BASE -->
+    <div class="modal-backdrop" id="modal-glossary">
+      <div class="modal-box modal-wide">
+        <div class="modal-head" style="background:linear-gradient(135deg, var(--azul-escuro), var(--azul));">
+          <div><strong>📖 Regras de Cálculo, Glossário & Qualidade da Base</strong><div style="font-size:10px; opacity:0.85;" id="gloss-sub">—</div></div>
+          <button type="button" class="modal-close" data-close="modal-glossary" aria-label="Fechar">&times;</button>
+        </div>
+        <div class="modal-content" id="gloss-content"></div>
+        <div class="modal-footer"><button type="button" class="btn-action" style="background:var(--azul-escuro);" data-close="modal-glossary">Fechar</button></div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+
+  <script src="sustentacao-painel-config.js?v=2026.11.12-1208"></script>
+  <script src="sustentacao-painel-dados.js?v=2026.11.12-1208"></script>
+  <script src="sustentacao-painel-app.js?v=2026.11.12-1208"></script>
+</body>
+</html>

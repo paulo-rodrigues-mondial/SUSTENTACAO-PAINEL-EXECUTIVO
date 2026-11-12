@@ -1,0 +1,78 @@
+========================================================================
+SUSTENTAÇÃO MONDIAL - PAINEL EXECUTIVO
+Gestão de Chamados, SLA e Desempenho Operacional • N3 - Sistemas Sustentação
+Padrão visual e de regras: Painel GMUD (gmud-painel v2026.11.11-1740)
+========================================================================
+
+ESTRUTURA:
+  • index.html ......................... página principal (abra no navegador)
+  • sustentacao-painel-app.js .......... lógica, KPIs, gráficos, Modo TV
+  • sustentacao-painel-estilo.css ...... estilos do GMUD + extensões da Sustentação
+  • sustentacao-painel-config.js ....... regras de negócio (estados, faixas, metas, Modo TV)
+  • sustentacao-painel-dados.js ........ cópia da base tratada (uso sem servidor)
+  • data/base-sustentacao.json ......... BASE OFICIAL tratada (lida pelo servidor ao abrir)
+  • tools/gerar_dados_sustentacao.py ... gera a base oficial a partir da exportação
+  • entrada/ ........................... onde fica a exportação bruta do Freshservice
+                                         (NÃO vai para o GitHub — ver .gitignore)
+  • Dockerfile ......................... Nginx estático (mesmo padrão do GMUD)
+
+------------------------------------------------------------------------
+1. COMO ABRIR
+------------------------------------------------------------------------
+  Publicado no servidor: o painel lê data/base-sustentacao.json ao abrir.
+  No computador: dois cliques em index.html (usa sustentacao-painel-dados.js).
+  Os gráficos usam Chart.js da internet, como o GMUD. Sem internet, KPIs e
+  tabelas funcionam e os gráficos mostram um aviso.
+
+------------------------------------------------------------------------
+2. COMO ATUALIZAR A BASE PARA TODOS
+------------------------------------------------------------------------
+  1. Exporte os tickets do Freshservice (.xlsx) — confira o FILTRO DE PERÍODO:
+     a exportação precisa trazer os chamados criados até o dia da exportação.
+  2. Copie o arquivo exporttickets-<data>.xlsx para a pasta entrada/.
+  3. Rode:   pip install openpyxl
+             python tools/gerar_dados_sustentacao.py
+     (atualiza data/base-sustentacao.json e sustentacao-painel-dados.js e avisa
+      se a exportação estiver incompleta)
+  4. Publique (commit no GitHub / cópia para o servidor).
+  Quem abrir ou recarregar o painel depois disso já vê a nova base.
+
+  PRIVACIDADE (D-05): a planilha bruta tem descrição, solução, nome e e-mail
+  do solicitante. Ela NÃO é publicada. O script grava só as colunas usadas e
+  mascara e-mail, CPF e CNPJ no Assunto.
+
+  Botão "Pré-visualizar Base" (rodapé da Visão Executiva): mostra outra
+  exportação só na sua tela. Não grava nada e não muda o painel dos outros;
+  ao recarregar a página, volta a base oficial. Precisa de internet.
+
+------------------------------------------------------------------------
+3. REGRAS (iguais às do Painel GMUD)
+------------------------------------------------------------------------
+  ATRASADO ............... em aberto com Hora de vencimento < data da exportação
+  FECHADO FORA DO PRAZO .. encerrado com Hora de resolução > Hora de vencimento
+                           (= "SLA Violated" do Freshservice; o painel confere as
+                            duas formas e mostra divergências em "Regra × Ferramenta")
+  TAXA NO PRAZO .......... Within SLA ÷ (Within SLA + SLA Violated), encerrados
+  LEAD TIME .............. resolução − criação, dias corridos (média e mediana)
+  AGING / CRÍTICO ........ data da exportação − criação; crítico > 30 dias
+  INCONFORMIDADE ......... Agente "No Agent" ou Categoria vazia
+  Em aberto: Aberto, ReOpen, Pendente, Pendente Aprovação, Pendente Fornecedor
+  Encerrados: Resolvido, Fechado
+  Metas e faixas ficam em sustentacao-painel-config.js (não há meta de SLA
+  definida; com metaSla = null o painel não aplica semáforo de meta).
+  Fórmulas completas e qualidade da base: botão "📖 Regras" no cabeçalho.
+
+------------------------------------------------------------------------
+4. MODO TV
+------------------------------------------------------------------------
+  Botão "Modo TV": tela cheia, desenho em 1600 px reduzido para caber na TV,
+  rotação das 8 abas a cada 25 s (config). Sair: botão ou tecla Esc.
+
+------------------------------------------------------------------------
+5. VERSÃO
+------------------------------------------------------------------------
+  A versão aparece no rodapé e no ?v= dos arquivos em index.html (evita cache).
+  Ao publicar mudanças de código, troque a versão nos dois lugares.
+
+Desenvolvido para o time Sustentação & GMUD - Mondial Eletrodomésticos.
+========================================================================

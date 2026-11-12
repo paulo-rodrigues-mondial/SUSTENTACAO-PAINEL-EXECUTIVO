@@ -1,0 +1,14 @@
+# Exportação bruta do Freshservice: tem descrição, solução, nome e e-mail do solicitante (D-05)
+entrada/*
+!entrada/.gitkeep
+exporttickets-*.xlsx
+exporttickets-*.csv
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+__pycache__/
+.vscode/
+.idea/
